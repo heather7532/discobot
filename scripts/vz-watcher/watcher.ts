@@ -275,8 +275,14 @@ export async function updateEnvFile(
 		lines.push("");
 	}
 
+	// Skip unchanged writes: the server's air watcher restarts on any .env write.
+	const newContent = lines.join("\n");
+	if (newContent === envContent) {
+		return true;
+	}
+
 	try {
-		await writeFile(envFilePath, lines.join("\n"), "utf-8");
+		await writeFile(envFilePath, newContent, "utf-8");
 		return true;
 	} catch {
 		return false;
